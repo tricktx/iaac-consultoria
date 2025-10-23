@@ -1,0 +1,8 @@
+# Ignorar providers e pastas Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+*.tfstate.*
+*.lock.hcl
+gold/.terraform/
+silver/.terraform/
