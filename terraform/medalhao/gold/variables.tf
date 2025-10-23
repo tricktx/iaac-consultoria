@@ -32,6 +32,12 @@ variable "folder_id" {
     type        = string
     }
 
+variable "billing_account" {
+    description = "ID da conta de faturamento (ex: XXXXXX-XXXXXX-XXXXXX)"
+    type        = string
+
+
+}
 
 
 ###########
@@ -57,19 +63,13 @@ variable "project_id" {
 variable "bucket_name" {
     description = "Nome do bucket"
     type        = string
-    default     = "bem-comum-gold"
-}
-
-variable "folder_bucket" {
-    description = "Nome da Pasta dentro do bucket"
-    type        = string
-    default     = "gold/"
+    default     = "gcs-bem-comum-gold"
 }
 
 variable "location" {
     description = "Localização do bucket"
     type        = string
-    default     = "us-central1"
+    default     = "southamerica-east1"
 }
 
 variable "storage_class" {
@@ -81,5 +81,5 @@ variable "storage_class" {
 variable "zone" {
     description     = "A região dos recursos do Google Cloud"
     type            = string
-    default         = "us-central1-a"
+    default         = "southamerica-east1-a"
     }

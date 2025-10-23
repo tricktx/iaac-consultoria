@@ -4,8 +4,8 @@
 resource "google_project" "project" {
   name            = var.project_name
   project_id      = var.project_id
-  folder_id      = "folders/${var.folder_id}"
-  #billing_account = var.billing_account
+  billing_account =  var.billing_account
+  folder_id       = "folders/${var.folder_id}"
   deletion_policy = "DELETE"
 }
 
@@ -14,7 +14,7 @@ resource "google_project" "project" {
 #############################
 resource "google_project_iam_member" "project_storage_viewer" {
   project = google_project.project.project_id
-  member  = "user:patrick.tx@hotmail.com.br"
+  member  = "group:engenharia.dados@abemcomum.org"
   role    = "roles/viewer"
   depends_on = [google_project_service.gcp_resource_manager_api]
 }
@@ -27,12 +27,6 @@ resource "google_storage_bucket" "bucket" {
   location      = var.location
   storage_class = var.storage_class
   project       = google_project.project.project_id
-}
-
-resource "google_storage_folder" "folder_bucket" {
-  bucket        = google_storage_bucket.bucket.name
-  name          = var.folder_bucket
-  depends_on    = [google_storage_bucket.bucket]
 }
 
 #############################
@@ -61,13 +55,13 @@ resource "google_service_account" "service_account_administradores_dados" {
 resource "google_project_iam_member" "subidores_storage_editor" {
   project = google_project.project.project_id
   role    = "roles/storage.objectAdmin"
-  member  = "domain:basedosdados.org"
+  member  = "group:engenharia.dados@abemcomum.org"
 }
 
 resource "google_project_iam_member" "subidores_bigquery_editor" {
   project = google_project.project.project_id
   role    = "roles/bigquery.dataEditor"
-  member  = "domain:basedosdados.org"
+  member  = "group:engenharia.dados@abemcomum.org"
 }
 
 # #############################
@@ -78,13 +72,13 @@ resource "google_project_iam_member" "subidores_bigquery_editor" {
 resource "google_project_iam_member" "admin_dados_storage" {
   project = google_project.project.project_id
   role    = "roles/storage.admin"
-  member  = "user:patrick.tx@hotmail.com.br"
+  member  = "group:engenharia.dados@abemcomum.org"
 }
 
 resource "google_project_iam_member" "admin_dados_bigquery" {
   project = google_project.project.project_id
   role    = "roles/bigquery.admin"
-  member  = "user:patrick.tx@hotmail.com.br"
+  member  = "group:engenharia.dados@abemcomum.org"
 
 }
 
@@ -137,7 +131,5 @@ resource "google_bigquery_connection" "default" {
 resource "google_project_iam_member" "connectionPermissionGrant" {
   project = google_project.project.project_id
   role    = "roles/storage.objectAdmin"
-  member  = "serviceAccount:${google_bigquery_connection.default.cloud_resource[0].service_account_id}"
-  depends_on = [ google_bigquery_connection.default,
-                 google_project_service.bigquery_api ]
+  member  = "group:engenharia.dados@abemcomum.org"
 }
