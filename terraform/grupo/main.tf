@@ -1,35 +1,20 @@
-resource "google_cloud_identity_group" "grupo_engenheiros_dados" {
-  display_name         = "grupo_engenheiros_dados"
+resource "google_project_service" "gcp_admin_api" {
+  project = "datalakehouse-475719"
+  service = "admin.googleapis.com"
+  disable_dependent_services = true
+  disable_on_destroy         = false
 
-  parent = "customers/C03jnxeie" # ID do cliente do Cloud Identity / Google Workspace
-
-  group_key {
-            id = "grupo_engenheiros_dados@abemcomum.org"
-  }
-
-  labels = {
-    "cloudidentity.googleapis.com/groups.discussion_forum" = ""
-  }
 }
 
-resource "google_cloud_identity_group_membership" "membros_engenheiros" {
+resource "googleworkspace_group" "equipe_dados" {
+  email       = "equipe_dados@abemcomum.org"
+  name        = "equipe_dados"
+  description = "Equipe Dados Group"
+  depends_on = [google_project_service.gcp_admin_api]
+}
 
-  for_each = toset([
-    "patrick.teixeira@basedosdados.org",
-    "gabriel.pisa@basedosdados.org",
-    "luiza.vilasboas@basedosdados.org",
-    "artemisia.weyl@basedosdados.org",
-    "laura.amaral@basedosdados.org"]
-  )
-
-
-  group = "groups/${google_cloud_identity_group.grupo_engenheiros_dados.name}"
-
-  preferred_member_key{
-    id = each.value
-  }
-
-  roles {
-    name = "MEMBER"
-  }
+resource "googleworkspace_group_member" "patrick" {
+  group_id = googleworkspace_group.equipe_dados.id
+  email    = "patrick.teixeira@basedosdados.org"
+  role     = "MEMBER"
 }

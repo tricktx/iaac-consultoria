@@ -1,15 +1,13 @@
 terraform {
     required_providers {
-        google = {
-                source  = "hashicorp/google" # 	Especifica o endereço de origem global do provedor.
-                version = "6.36.1" # 	Especifica a versão do provedor que essa configuração deve usar.
-        }
+    googleworkspace = {
+        source  = "hashicorp/googleworkspace"
+        version = "~> 0.7"
+    }
     }
 }
 
-provider "google" {
-    user_project_override = true
-    region                  = var.location
-    zone                    = var.zone
-    billing_project         = "datalakehouse-475719"
+provider "googleworkspace" {
+    credentials = file("/home/tricktx/iaac-consultoria/service-account.json")
+    customer_id = ""  #ID da organização Google Workspace
 }
