@@ -55,7 +55,7 @@ variable "bucket_name" {
 variable "location" {
     description = "Localização do bucket"
     type        = string
-    default     = "us-central1"
+    default     = "southamerica-east1"
 }
 
 variable "storage_class" {
@@ -67,5 +67,5 @@ variable "storage_class" {
 variable "zone" {
     description     = "A região dos recursos do Google Cloud"
     type            = string
-    default         = "us-central1-a"
+    default         = "southamerica-east1-a"
     }

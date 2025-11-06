@@ -54,11 +54,13 @@ resource "google_monitoring_notification_channel" "email_channel" {
 ############################
 resource "google_billing_budget" "budget_bigquery" {
   billing_account = var.billing_account
-  display_name    = "Budget BigQuery"
+  display_name    = "Budget BigQuery and Storage"
 
   budget_filter {
     projects = ["projects/${var.project_id}"]
-    services = [local.services.bigquery]
+    resource_ancestors = [ "folders/${var.folder_id}"]
+    services = [local.services.bigquery,
+                local.services.storage]
   }
 
   amount {
@@ -90,35 +92,35 @@ resource "google_billing_budget" "budget_bigquery" {
 #############################
 # BUDGET STORAGE
 #############################
-resource "google_billing_budget" "budget_storage" {
-  billing_account = var.billing_account
-  display_name    = "Budget Storage"
+# resource "google_billing_budget" "budget_storage" {
+#   billing_account = var.billing_account
+#   display_name    = "Budget Storage"
 
-  budget_filter {
-    projects = ["projects/${var.project_id}"]
-    services = [local.services.storage]
-  }
+#   budget_filter {
+#     projects = ["projects/${var.project_id}"]
+#     services = [local.services.storage]
+#   }
 
-  amount {
-    specified_amount {
-      currency_code = "BRL"
-      units         = "10"
-    }
-  }
+#   amount {
+#     specified_amount {
+#       currency_code = "BRL"
+#       units         = "10"
+#     }
+#   }
 
-  threshold_rules { # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/billing_budget#nested_threshold_rules
-      threshold_percent = local.thresholds.threshold
-    }
+#   threshold_rules { # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/billing_budget#nested_threshold_rules
+#       threshold_percent = local.thresholds.threshold
+#     }
 
-  all_updates_rule {
-    monitoring_notification_channels = [
-      google_monitoring_notification_channel.email_channel.id,
-    ]
-    disable_default_iam_recipients = true
-  }
+#   all_updates_rule {
+#     monitoring_notification_channels = [
+#       google_monitoring_notification_channel.email_channel.id,
+#     ]
+#     disable_default_iam_recipients = true
+#   }
 
-  depends_on = [google_project_service.gcp_storage_api,
-                google_project_service.billing_budget_api,
-                google_project_service.billing_monitoring_api,
-                google_project_service.billing_iam_api,]
-}
+#   depends_on = [google_project_service.gcp_storage_api,
+#                 google_project_service.billing_budget_api,
+#                 google_project_service.billing_monitoring_api,
+#                 google_project_service.billing_iam_api,]
+# }

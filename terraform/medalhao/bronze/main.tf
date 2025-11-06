@@ -14,7 +14,7 @@ resource "google_project" "project" {
 #############################
 resource "google_project_iam_member" "project_storage_viewer" {
   project = google_project.project.project_id
-  member  = "group:grupo_engenheiros"
+  member  = "group:engenharia.dados@abemcomum.org"
   role    = "roles/viewer"
   depends_on = [google_project_service.gcp_resource_manager_api]
 }
@@ -55,13 +55,13 @@ resource "google_service_account" "service_account_administradores_dados" {
 resource "google_project_iam_member" "subidores_storage_editor" {
   project = google_project.project.project_id
   role    = "roles/storage.objectAdmin"
-  member  = "domain:basedosdados.org"
+  member  = "group:engenharia.dados@abemcomum.org"
 }
 
 resource "google_project_iam_member" "subidores_bigquery_editor" {
   project = google_project.project.project_id
   role    = "roles/bigquery.dataEditor"
-  member  = "domain:basedosdados.org"
+  member  = "group:engenharia.dados@abemcomum.org"
 }
 
 # #############################
@@ -72,13 +72,13 @@ resource "google_project_iam_member" "subidores_bigquery_editor" {
 resource "google_project_iam_member" "admin_dados_storage" {
   project = google_project.project.project_id
   role    = "roles/storage.admin"
-  member  = "user:patrick.tx@hotmail.com.br"
+  member  = "group:engenharia.dados@abemcomum.org"
 }
 
 resource "google_project_iam_member" "admin_dados_bigquery" {
   project = google_project.project.project_id
   role    = "roles/bigquery.admin"
-  member  = "user:patrick.tx@hotmail.com.br"
+  member  = "group:engenharia.dados@abemcomum.org"
 
 }
 
@@ -121,15 +121,33 @@ resource "google_project_service" "gcp_serviceusage_api" {
 ##########################
 resource "google_bigquery_connection" "default" {
   connection_id = "my_cloud_resource_connection"
+
   project       = google_project.project.project_id
-  location      = "US"
+  location      = google_storage_bucket.bucket.location
+  
   cloud_resource {}
-  depends_on = [google_project_service.gcp_resource_manager_api,
-                google_project_service.bigquery_api]
+
+  depends_on = [
+    google_project_service.gcp_resource_manager_api,
+    google_project_service.bigquery_api
+  ]
+}
+
+
+resource "google_storage_bucket_iam_member" "bq_connection_bucket_access_creator" {
+  bucket = "gcs-bem-comum-bronze"
+  role   = "roles/storage.objectCreator"
+  member = "serviceAccount:${google_bigquery_connection.default.cloud_resource[0].service_account_id}"
+}
+
+resource "google_storage_bucket_iam_member" "bq_connection_bucket_access_viewer" {
+  bucket = "gcs-bem-comum-bronze"
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_bigquery_connection.default.cloud_resource[0].service_account_id}"
 }
 
 resource "google_project_iam_member" "connectionPermissionGrant" {
   project = google_project.project.project_id
   role    = "roles/storage.objectAdmin"
-  member  = "serviceAccount:${google_bigquery_connection.default.cloud_resource[0].service_account_id}"
+  member  = "group:engenharia.dados@abemcomum.org"
 }
